@@ -1,0 +1,94 @@
+p8-platform (2.1.0.1~#DIST#) #DIST#; urgency=medium
+
+  * [tvos] remove IOKit linkage. credits @Memphiz
+  * [posix] use standard SO versioning. credits @rbalint
+  * [posix] install pkg-config and .cmake files in arch-specific libdirs.
+    credits @rbalint
+  * [posix] fixed: wrong timeout in SocketRead(). closes #27. credits @SeppSTA
+  * [windows] added support files for building
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 24 Oct 2016 10:56:12 +0100
+
+p8-platform (2.0.1-1~#DIST#) #DIST#; urgency=medium
+
+  * Avoid that cmake removes variables from pkg-config file
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 19 Jan 2016 20:48:37 +0100
+
+p8-platform (2.0.0-1~#DIST#) #DIST#; urgency=medium
+
+  * renamed to p8-platform
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 01 Dec 2015 03:22:00 +0100
+
+platform (2.0.0-1~#DIST#) #DIST#; urgency=medium
+
+  * removed: fstrcmp and StringUtils::CompareFuzzy() +
+    StringUtils::FindBestMatch() because of an incompatible license
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 01 Dec 2015 02:48:06 +0100
+
+platform (1.0.10-1~#DIST#) #DIST#; urgency=medium
+
+  * fixed: posix socket return value for connect
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Tue, 30 Jun 2015 10:53:06 +0100
+
+platform (1.0.9-1~#DIST#) #DIST#; urgency=medium
+
+  * fixed: add missing stdio.h include in windows/os-socket.h
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Wed, 13 May 2015 10:01:43 +0100
+
+platform (1.0.8-1~#DIST#) #DIST#; urgency=medium
+
+  * added: cdevsocket.h character device socket
+  * fixed: guards for #defines on OS X and iOS for values already defined in
+    CFPlugInCOM.h
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 11 May 2015 09:33:17 +0100
+
+platform (1.0.7-1~#DIST#) #DIST#; urgency=medium
+
+  * fixed: include on OS X
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 08 May 2015 22:15:23 +0100
+
+platform (1.0.6-1~#DIST#) #DIST#; urgency=medium
+
+  * fixed: add include path and link the threads lib
+  * (re-)added: public Reset() function in CEvent
+  * sync UseMultiArch.cmake
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 07 May 2015 21:20:00 +0100
+
+platform (1.0.5-1~#DIST#) #DIST#; urgency=medium
+
+  * fixed: missing #include <string> in socket.h
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Mon, 04 May 2015 01:29:00 +0100
+
+platform (1.0.4-1~#DIST#) #DIST#; urgency=medium
+
+  * proper platform.pc.in fix
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Sun, 03 May 2015 21:56:00 +0100
+
+platform (1.0.3-1~#DIST#) #DIST#; urgency=medium
+
+  * platform.pc.in fix
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 01 May 2015 14:38:00 +0100
+
+platform (1.0.2-1~#DIST#) #DIST#; urgency=medium
+
+  * Build fixes
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Fri, 01 May 2015 01:38:00 +0100
+
+platform (1.0.0-1~#DIST#) #DIST#; urgency=medium
+
+  * Initial release
+
+ -- Pulse-Eight Packaging <packaging@pulse-eight.com>  Thu, 12 Mar 2015 13:35:07 +0100
+

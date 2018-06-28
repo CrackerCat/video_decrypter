@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@
+includedir=@CMAKE_INSTALL_PREFIX@/include
+DEPENDENCIES=@p8-platform_LIBRARIES@
+
+Name: @p8-platform_NAME@
+Description: @p8-platform_DESCRIPTION@ @p8-platform_VERSION_MAJOR@.@p8-platform_VERSION_MINOR@
+Version: @p8-platform_VERSION_MAJOR@.@p8-platform_VERSION_MINOR@.@p8-platform_VERSION_PATCH@
+Libs: -L${libdir} -lp8-platform
+Cflags: -I${includedir}
