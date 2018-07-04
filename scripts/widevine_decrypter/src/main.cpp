@@ -24,38 +24,26 @@ AP4_Result FragmentedSampleReader::ReadSample()
             return result;
         }
 
-        //AP4_AvcSequenceParameterSet sps;
-        //AP4_AvcFrameParser::ParseFrameForSPS(m_sampleData.GetData(), m_sampleData.GetDataSize(), 4, sps);
-
         //Protection could have changed in ProcessMoof
         if (!decrypterPresent && m_decrypter != nullptr && !useDecryptingDecoder)
             m_encrypted.SetData(m_sampleData.GetData(), m_sampleData.GetDataSize());
         else if (decrypterPresent && m_decrypter == nullptr && !useDecryptingDecoder)
             m_sampleData.SetData(m_encrypted.GetData(), m_encrypted.GetDataSize());
 
+        // Make sure that the decrypter is NOT allocating memory!
+        // If decrypter and addon are compiled with different DEBUG / RELEASE
+        // options freeing HEAP memory will fail.
         if (m_decrypter)
         {
-            // Make sure that the decrypter is NOT allocating memory!
-            // If decrypter and addon are compiled with different DEBUG / RELEASE
-            // options freeing HEAP memory will fail.
             m_sampleData.Reserve(m_encrypted.GetDataSize() + 4096);
-
             result = m_decrypter->DecryptSampleData(m_poolId, m_encrypted, m_sampleData, NULL);
         }
         else if (useDecryptingDecoder)
         {
             m_sampleData.Reserve(m_encrypted.GetDataSize() + 1024);
-            m_singleSampleDecryptor->DecryptSampleData(m_poolId, m_encrypted, m_sampleData, nullptr, 0, nullptr, nullptr);
+            result = m_singleSampleDecryptor->DecryptSampleData(m_poolId, m_encrypted, m_sampleData, nullptr, 0, nullptr, nullptr);
         }
-
-        if (m_codecHandler->Transform(m_sampleData, m_track->GetMediaTimeScale()))
-            m_codecHandler->ReadNextSample(m_sample, m_sampleData);
     }
-
-    m_dts = (m_sample.GetDts() * m_timeBaseExt) / m_timeBaseInt;
-    m_pts = (m_sample.GetCts() * m_timeBaseExt) / m_timeBaseInt;
-
-    m_codecHandler->UpdatePPSId(m_sampleData);
 
 
     // Write initialisation & data into decrypted file
@@ -79,7 +67,7 @@ AP4_Result FragmentedSampleReader::ReadSample()
     file_decrypted_data.write(buffer.data(), metadata_length);
     file_decrypted_data.write((const char*)m_sampleData.GetData(), m_sampleData.GetDataSize());
 
-    return AP4_SUCCESS;
+    return result;
 };
 
 class MyHost : public SSD::SSD_HOST
@@ -105,6 +93,7 @@ public:
             *(std::stringstream*)file << " --data-binary @\"" << GetProfilePath() << "EDEF8BA9-79D6-4ACE-A3C8-27DCD51D21ED.challenge\" ";
         else
             *(std::stringstream*)file << " -H \"" << name << ": " << value << "\" ";
+        return true;
     }
     virtual bool CURLOpen(void* file) override
     {
@@ -237,9 +226,9 @@ int main(int argc, char *argv[])
     SSD::SSD_DECRYPTER *decrypter_;
 
 #ifdef NDEBUG
-    std::string lib_wvdecrypter_path = "wvdecrypter/libssd_wv.dll";
+    std::string lib_wvdecrypter_path = std::string(dirname(strdup(argv[0]))) + "/wvdecrypter/libssd_wv.dll";
 #else
-    std::string lib_wvdecrypter_path = "wvdecrypter/libssd_wvd.dll";
+    std::string lib_wvdecrypter_path = std::string(dirname(strdup(argv[0]))) + "/wvdecrypter/libssd_wvd.dll";
 #endif // NDEBUG
 
     void * mod(dlopen(lib_wvdecrypter_path.c_str(), RTLD_LAZY));
@@ -587,9 +576,28 @@ int main(int argc, char *argv[])
             }
     }
     stream->reader_->GetInformation(stream->info_);
-
     SampleReader *sr(GetNextSample());
-    while(AP4_SUCCEEDED(sr->ReadSample()));
+
+    AP4_Result result = AP4_SUCCESS;
+    int error_count = 0;
+    int sample_count = 0;
+    while (error_count < 50 && result != AP4_ERROR_EOS)
+    {
+        // Limit of 1000 samples/second for CDM decryption
+        if(sample_count>900)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            sample_count = 0;
+        }
+
+        result = sr->ReadSample();
+        sample_count++;
+
+        if(AP4_SUCCEEDED(result))
+            error_count = 0;
+        else
+            error_count++;
+    }
 
     printf("Decryption finished.\n");
     return 0;

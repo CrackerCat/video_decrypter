@@ -225,10 +225,6 @@ void CdmAdapter::TimerExpired(void* context)
 cdm::Status CdmAdapter::Decrypt(const cdm::InputBuffer& encrypted_buffer,
   cdm::DecryptedBlock* decrypted_buffer)
 {
-  //We need this wait here for fast systems, during buffering
-  //widewine stopps if some seconds (5??) are fetched too fast
-  std::this_thread::sleep_for(std::chrono::milliseconds(5));
-
   std::lock_guard<std::mutex> lock(decrypt_mutex_);
 
   active_buffer_ = decrypted_buffer->DecryptedBuffer();

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <windows.h>
+#include <libgen.h>
 
 #include "../lib/libbento4/Core/Ap4.h"
 #include "../lib/inputstream.adaptive/parser/DASHTree.h"
