@@ -7,7 +7,7 @@ num_episode_regexp = re.compile('catalogue/episode/(.*?)/')
 manifest_regexp = re.compile(r'''(/fr/v2/video/mnf.*?\?.+?)['"][;,]''')
 widevine_regexp = re.compile(r"url: \"(.*?Widevine.*?)\",.*?headers.*?Authorization.*?value: \"(.*?)\"", re.DOTALL)
 
-urls_ep = open('../urls_episodes.txt').read().splitlines()
+urls_ep = open('urls_episodes.txt').read().splitlines()
 headers = {'User-agent': 'Mozilla/5.0'}
 cookies = {'ASP.NET_SessionId':'opipygbpcm5p14ak0tvys5je'}
 
