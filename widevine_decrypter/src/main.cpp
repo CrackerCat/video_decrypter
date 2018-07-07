@@ -154,7 +154,7 @@ bool MyAdaptiveStream::download(const char* url, const std::map<std::string, std
 
 bool adaptive::AdaptiveTree::download(const char* url, const std::map<std::string, std::string> &manifestHeaders, void *opaque)
 {
-    file_mpd = std::ifstream(info_path+"\\"+nom_video+"\\manifest.mpd");
+    file_mpd = std::ifstream(info_path+"\\manifest.mpd");
     std::stringstream buffer;
     buffer << file_mpd.rdbuf();
     file_mpd.close();
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
         return -1;
 
     nom_video = nom_fragment.substr(0,nom_fragment.find("_"));
-    printf("Fichier : %s\n", nom_fragment.c_str());
+    printf("File : %s\n", nom_fragment.c_str());
     printf("Info path : %s\n", info_path.c_str());
     printf("Decrypted path : %s\n", decrypted_path.c_str());
 
@@ -203,14 +203,14 @@ int main(int argc, char *argv[])
     file_decrypted_data = std::ofstream(decrypted_path+"\\"+nom_video+extension, std::ios::binary | std::ios::trunc);
 
     MyHost host;
-    profile_path = info_path+"\\"+nom_video+"\\"+std::to_string(std::time(0))+"\\";
+    profile_path = info_path+"\\"+std::to_string(std::time(0))+"\\";
     host.Create_Directory(profile_path.c_str());
 
     // --------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------
     printf("Initialisation...\n");
 
-    std::ifstream file_lic(info_path+"\\"+nom_video+"\\licence_key.txt");
+    std::ifstream file_lic(info_path+"\\licence_key.txt");
     std::stringstream buffer;
     buffer << file_lic.rdbuf();
     file_lic.close();
