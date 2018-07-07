@@ -37,6 +37,7 @@ def get_info_video(url):
 	if not os.path.exists('../tmp/_info'):  os.mkdir('../tmp/_info')
 	if not os.path.exists('../tmp/_info/'+nom_video):  os.mkdir('../tmp/_info/'+nom_video)
 
+	# https://github.com/peak3d/inputstream.adaptive/wiki/Playing-multi-bitrate-stream-from-a-python-addon
 	with open('../tmp/_info/'+nom_video+'/licence_key.txt', 'w') as file:
 		file.write(url_widevine + "|" + urlencode({"Authorization": auth_token}) + "&User-Agent=Mozilla%2F5.0|R{SSM}|")
 
