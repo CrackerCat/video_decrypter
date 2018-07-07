@@ -82,4 +82,4 @@ for i in range(len(urls_ep)):
 	thread.start()
 	threads.append(thread)
 
-for t in threads:  t.join()   # Attente fin requetes
+for t in threads:  t.join()   # Wait for threads

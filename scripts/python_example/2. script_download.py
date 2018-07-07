@@ -54,7 +54,7 @@ for info_vid in L:
 		q.put([info_vid[0],url,url_number])
 
 nb_urls = url_number
-while q.qsize()>0:   # Toujours laisser ce while avant q.join() pour garder arret avec CTRL+C (sauf a la fin quand q est vide)
+while q.qsize()>0:   # Enable stop with CTRL+C
 	os.system('cls')
 	for t in threads:
 		print('Thread %s: %s/%s' %(t.id,t.url_number,nb_urls))
