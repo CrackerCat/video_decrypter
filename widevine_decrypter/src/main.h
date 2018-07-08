@@ -21,10 +21,10 @@ std::ofstream file_decrypted_data;
 std::ifstream file_fragment;
 std::ifstream file_mpd;
 std::string encrypted_file;
+std::string stream_id_str;
 std::string info_path;
 std::string decrypted_path;
 std::string profile_path;
-std::string nom_video;
 
 bool StartProcess(const char *proc)
 {

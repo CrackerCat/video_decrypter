@@ -12,4 +12,4 @@ else:
 L = os.listdir('../tmp/_info')
 for i in range(len(L)):
 	os.system('start ffmpeg -i "%s" -i "%s" -c copy -map 0 -map 1 "%s"'
-				%('../tmp/_decrypted/'+L[i]+'_video.ts','../tmp/_decrypted/'+L[i]+'_audio.m4a','../'+L[i]+'.mp4'))
+				%('../tmp/_decrypted/'+L[i]+'_track_1','../_tmp/_decrypted/'+L[i]+'_track_2','../'+L[i]+'.mp4'))

@@ -165,42 +165,38 @@ bool adaptive::AdaptiveTree::download(const char* url, const std::map<std::strin
 
 int main(int argc, char *argv[])
 {
-    if(argc != 4)
+    if(argc != 5)
     {
-        printf("Syntax : program.exe {encrypted_file} {info_path} {decrypted_path}");
+        printf("Syntax : program.exe {encrypted_file} {stream_id} {info_path} {decrypted_path}");
         return -1;
     }
 
     encrypted_file = argv[1];
-    info_path = argv[2];
-    decrypted_path = argv[3];
+    stream_id_str = argv[2];
+    info_path = argv[3];
+    decrypted_path = argv[4];
 
     std::string nom_fragment = encrypted_file.substr(encrypted_file.find_last_of("/\\")+1);
     std::string type_fragment = nom_fragment.substr(nom_fragment.find("_")+1);
 
     int stream_id;
-    std::string extension;
-
-    if (type_fragment == "video")
+    try
     {
-        stream_id = 1;
-        extension = "_video.ts";
+        stream_id = std::stoi(stream_id_str, nullptr);
     }
-    else if (type_fragment == "audio")
+    catch(const std::exception& e)
     {
-        stream_id = 2;
-        extension = "_audio.m4a";
-    }
-    else
+        printf("Unknown stream id.\n");
         return -1;
+    }
 
-    nom_video = nom_fragment.substr(0,nom_fragment.find("_"));
+    std::string nom_video = nom_fragment.substr(0,nom_fragment.find("_"));
     printf("File : %s\n", nom_fragment.c_str());
     printf("Info path : %s\n", info_path.c_str());
     printf("Decrypted path : %s\n", decrypted_path.c_str());
 
     file_fragment = std::ifstream(encrypted_file, std::ios::binary);
-    file_decrypted_data = std::ofstream(decrypted_path+"\\"+nom_video+extension, std::ios::binary | std::ios::trunc);
+    file_decrypted_data = std::ofstream(decrypted_path+"\\"+nom_video+"_track_"+stream_id_str, std::ios::binary | std::ios::trunc);
 
     MyHost host;
     profile_path = info_path+"\\"+std::to_string(std::time(0))+"\\";
@@ -210,7 +206,7 @@ int main(int argc, char *argv[])
     // --------------------------------------------------------------------------------------------------------------
     printf("Initialisation...\n");
 
-    std::ifstream file_lic(info_path+"\\licence_key.txt");
+    std::ifstream file_lic(info_path+"\\license_key.txt");
     std::stringstream buffer;
     buffer << file_lic.rdbuf();
     file_lic.close();
@@ -499,7 +495,10 @@ int main(int argc, char *argv[])
     STREAM *stream(GetStream(stream_id));
 
     if (!stream || stream->enabled)
-        return false;
+    {
+        printf("Stream id not found.\n");
+        return -1;
+    }
 
     stream->enabled = true;
 
