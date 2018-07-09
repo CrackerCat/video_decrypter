@@ -642,11 +642,13 @@ bool WV_CencSingleSampleDecrypter::SendSessionMessage()
   }
 
   //Process body
+  bool flag_SSM = false;
   if (!blocks[2].empty())
   {
     insPos = blocks[2].find("{SSM}");
     if (insPos != std::string::npos)
     {
+      flag_SSM = true;
       std::string::size_type sidSearchPos(insPos);
       if (insPos > 0)
       {
@@ -688,7 +690,17 @@ bool WV_CencSingleSampleDecrypter::SendSessionMessage()
         }
       }
     }
-    std::string decoded = b64_encode(reinterpret_cast<const unsigned char*>(blocks[2].data()), blocks[2].size(), false);
+    // std::string decoded = b64_encode(reinterpret_cast<const unsigned char*>(blocks[2].data()), blocks[2].size(), false);
+    std::string decoded = blocks[2].data();
+    if (flag_SSM)
+    {
+        FILE*f = fopen(strDbg.c_str(), "wb");
+        if (f) {
+          fwrite(blocks[2].data(), 1, blocks[2].size(), f);
+          fclose(f);
+        }
+    }
+
     host->CURLAddOption(file, SSD_HOST::OPTION_PROTOCOL, "postdata", decoded.c_str());
   }
 
