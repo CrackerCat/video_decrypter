@@ -418,7 +418,7 @@ void UpdateStream(STREAM &stream, const SSD::SSD_DECRYPTER::SSD_CAPS &caps)
     if ((caps.flags & SSD::SSD_DECRYPTER::SSD_CAPS::SSD_ANNEXB_REQUIRED)
       && stream.info_.m_streamType == INPUTSTREAM_INFO::TYPE_VIDEO)
     {
-     printf("UpdateStream: Convert avc -> annexb");
+     printf("UpdateStream: Convert avc -> annexb\n");
       annexb = avc_to_annexb(rep->codec_private_data_);
     }
     else

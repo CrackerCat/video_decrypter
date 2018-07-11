@@ -139,9 +139,6 @@ public:
 
 bool MyAdaptiveStream::download(const char* url, const std::map<std::string, std::string> &mediaHeaders)
 {
-    if(std::string(url).find("i,format=") == std::string::npos)
-        return true;
-
     file_fragment.seekg(0, std::ios::end);
     int length = file_fragment.tellg();
     file_fragment.seekg(0, std::ios::beg);
