@@ -3,9 +3,6 @@
 
 AP4_Result FragmentedSampleReader::ReadSample()
 {
-    AP4_Position pos_init, pos_after_sample;
-    m_FragmentStream->Tell(pos_init);
-
     AP4_Result result;
     if (!m_codecHandler || !m_codecHandler->ReadNextSample(m_sample, m_sampleData))
     {
@@ -45,25 +42,23 @@ AP4_Result FragmentedSampleReader::ReadSample()
         }
     }
 
-
-    // Write initialisation & data into decrypted file
-    std::vector<char> buffer;
-    int pos_decrypted = file_decrypted_data.tellp();
-    if(pos_decrypted < pos_init)
+    if(IsEncrypted())
     {
-        buffer.reserve(pos_init - pos_decrypted);
-        file_fragment.seekg(pos_decrypted, std::ios::beg);
-        file_fragment.read(buffer.data(), pos_init - pos_decrypted);
-        file_decrypted_data.write(buffer.data(), pos_init - pos_decrypted);
+        printf("Decryption of track not yet supported.\n");
+        exit(-1);
     }
 
+    // Write initialisation & data into decrypted file
+    AP4_Position pos_after_sample;
     m_FragmentStream->Tell(pos_after_sample);
-    int metadata_length = pos_after_sample - m_sampleData.GetDataSize() - pos_init;
+    pos_after_sample -= stream_start_pos;
 
-    buffer.reserve(metadata_length);
-    file_fragment.seekg(pos_init, std::ios::beg);
+    int pos_decrypted = file_decrypted_data.tellp();
+    int metadata_length = pos_after_sample - m_sampleData.GetDataSize() - pos_decrypted;
+
+    std::vector<char> buffer(metadata_length, 0);
+    file_fragment.seekg(pos_decrypted, std::ios::beg);
     file_fragment.read(buffer.data(), metadata_length);
-
     file_decrypted_data.write(buffer.data(), metadata_length);
     file_decrypted_data.write((const char*)m_sampleData.GetData(), m_sampleData.GetDataSize());
 
@@ -146,6 +141,8 @@ bool MyAdaptiveStream::download(const char* url, const std::map<std::string, std
     std::vector<char> buffer(length, 0);
     file_fragment.read(buffer.data(), length);
     write_data(buffer.data(), length);
+
+    file_fragment.clear();
     return true;
 }
 
@@ -500,6 +497,8 @@ int main(int argc, char *argv[])
     stream->enabled = true;
 
     stream->stream_.start_stream(~0, GetVideoWidth(), GetVideoHeight());
+	stream_start_pos = stream->stream_.tell();
+
     const adaptive::AdaptiveTree::Representation *rep(stream->stream_.getRepresentation());
 
     // If we select a dummy (=inside video) stream, open the video part

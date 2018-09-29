@@ -25,6 +25,7 @@ std::string stream_id_str;
 std::string info_path;
 std::string decrypted_path;
 std::string profile_path;
+AP4_Position stream_start_pos = 0;
 
 bool StartProcess(const char *proc)
 {

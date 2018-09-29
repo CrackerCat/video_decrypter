@@ -247,7 +247,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         atom = NULL;
         return result;
     }
-    
+    if(atom->GetType() == 0) {return AP4_ERROR_READ_FAILED;}
     return AP4_SUCCESS;
 }
 
