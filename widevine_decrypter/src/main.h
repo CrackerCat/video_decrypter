@@ -2,7 +2,9 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#ifdef OS_WIN
 #include <windows.h>
+#endif
 #include <libgen.h>
 
 #include "../lib/libbento4/Core/Ap4.h"
@@ -10,7 +12,11 @@
 #include "../lib/inputstream.adaptive/common/AdaptiveStream.h"
 #include "../lib/inputstream.adaptive/SSD_dll.h"
 #include "../lib/inputstream.adaptive/helpers.h"
+#ifdef OS_WIN
 #include "../lib/p8-platform/src/windows/dlfcn-win32.h"
+#else
+#include <dlfcn.h>
+#endif
 
 #define SAFE_DELETE(p)   do { delete (p); (p)=NULL; } while (0)
 #define DVD_TIME_BASE 1000000
@@ -26,6 +32,7 @@ std::string info_path;
 std::string decrypted_path;
 std::string profile_path;
 
+#ifdef OS_WIN
 bool StartProcess(const char *proc)
 {
     STARTUPINFO si;
@@ -47,6 +54,7 @@ bool StartProcess(const char *proc)
     CloseHandle( pi.hThread );
     return true;
 }
+#endif
 
 static const AP4_Track::Type TIDC[adaptive::AdaptiveTree::STREAM_TYPE_COUNT] =
 {
