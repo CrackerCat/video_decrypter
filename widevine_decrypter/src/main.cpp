@@ -1,5 +1,10 @@
 #include "main.h"
 
+#ifndef OS_WIN
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
 
 AP4_Result FragmentedSampleReader::ReadSample()
 {
@@ -94,7 +99,10 @@ public:
     {
         std::stringstream *ss = (std::stringstream*)file;
         *ss << "-o \"" << GetProfilePath() << "EDEF8BA9-79D6-4ACE-A3C8-27DCD51D21ED.response\"";
+#ifdef OS_WIN
         return StartProcess((*ss).str().c_str());
+#endif
+        return execl((*ss).str().c_str(), NULL);
     }
     virtual std::vector<char> ReadFile() override
     {
@@ -115,7 +123,11 @@ public:
     }
     virtual bool Create_Directory(const char *dir) override
     {
+#ifdef OS_WIN
         return !CreateDirectoryA(dir, NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
+#else
+        return mkdir(dir, 0755) == 0;
+#endif
     }
     virtual void Log(LOGLEVEL level, const char *msg) override
     {
@@ -161,7 +173,7 @@ int main(int argc, char *argv[])
 {
     if(argc != 5)
     {
-        printf("Syntax : program.exe {encrypted_file} {stream_id} {info_path} {decrypted_path}");
+        printf("Syntax : %s {encrypted_file} {stream_id} {info_path} {decrypted_path}\n", argv[0]);
         return -1;
     }
 
