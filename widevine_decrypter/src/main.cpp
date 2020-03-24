@@ -1,11 +1,13 @@
 #include "main.h"
 
+#ifndef OS_WIN
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
 
 AP4_Result FragmentedSampleReader::ReadSample()
 {
-    AP4_Position pos_init, pos_after_sample;
-    m_FragmentStream->Tell(pos_init);
-
     AP4_Result result;
     if (!m_codecHandler || !m_codecHandler->ReadNextSample(m_sample, m_sampleData))
     {
@@ -45,25 +47,23 @@ AP4_Result FragmentedSampleReader::ReadSample()
         }
     }
 
-
-    // Write initialisation & data into decrypted file
-    std::vector<char> buffer;
-    int pos_decrypted = file_decrypted_data.tellp();
-    if(pos_decrypted < pos_init)
+    if(IsEncrypted())
     {
-        buffer.reserve(pos_init - pos_decrypted);
-        file_fragment.seekg(pos_decrypted, std::ios::beg);
-        file_fragment.read(buffer.data(), pos_init - pos_decrypted);
-        file_decrypted_data.write(buffer.data(), pos_init - pos_decrypted);
+        printf("Decryption of track not yet supported.\n");
+        exit(-1);
     }
 
+    // Write initialisation & data into decrypted file
+    AP4_Position pos_after_sample;
     m_FragmentStream->Tell(pos_after_sample);
-    int metadata_length = pos_after_sample - m_sampleData.GetDataSize() - pos_init;
+    pos_after_sample -= stream_start_pos;
 
-    buffer.reserve(metadata_length);
-    file_fragment.seekg(pos_init, std::ios::beg);
+    int pos_decrypted = file_decrypted_data.tellp();
+    int metadata_length = pos_after_sample - m_sampleData.GetDataSize() - pos_decrypted;
+
+    std::vector<char> buffer(metadata_length, 0);
+    file_fragment.seekg(pos_decrypted, std::ios::beg);
     file_fragment.read(buffer.data(), metadata_length);
-
     file_decrypted_data.write(buffer.data(), metadata_length);
     file_decrypted_data.write((const char*)m_sampleData.GetData(), m_sampleData.GetDataSize());
 
@@ -99,7 +99,10 @@ public:
     {
         std::stringstream *ss = (std::stringstream*)file;
         *ss << "-o \"" << GetProfilePath() << "EDEF8BA9-79D6-4ACE-A3C8-27DCD51D21ED.response\"";
+#ifdef OS_WIN
         return StartProcess((*ss).str().c_str());
+#endif
+        return execl((*ss).str().c_str(), NULL);
     }
     virtual std::vector<char> ReadFile() override
     {
@@ -120,7 +123,11 @@ public:
     }
     virtual bool Create_Directory(const char *dir) override
     {
+#ifdef OS_WIN
         return !CreateDirectoryA(dir, NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
+#else
+        return mkdir(dir, 0755) == 0;
+#endif
     }
     virtual void Log(LOGLEVEL level, const char *msg) override
     {
@@ -146,6 +153,8 @@ bool MyAdaptiveStream::download(const char* url, const std::map<std::string, std
     std::vector<char> buffer(length, 0);
     file_fragment.read(buffer.data(), length);
     write_data(buffer.data(), length);
+
+    file_fragment.clear();
     return true;
 }
 
@@ -164,7 +173,7 @@ int main(int argc, char *argv[])
 {
     if(argc != 5)
     {
-        printf("Syntax : program.exe {encrypted_file} {stream_id} {info_path} {decrypted_path}");
+        printf("Syntax : %s {encrypted_file} {stream_id} {info_path} {decrypted_path}\n", argv[0]);
         return -1;
     }
 
@@ -500,6 +509,8 @@ int main(int argc, char *argv[])
     stream->enabled = true;
 
     stream->stream_.start_stream(~0, GetVideoWidth(), GetVideoHeight());
+	stream_start_pos = stream->stream_.tell();
+
     const adaptive::AdaptiveTree::Representation *rep(stream->stream_.getRepresentation());
 
     // If we select a dummy (=inside video) stream, open the video part
