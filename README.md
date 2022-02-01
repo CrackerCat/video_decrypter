@@ -14,4 +14,12 @@ Compilation instructions on Windows :
 * `cmake .. -G "MinGW Makefiles"` to generate build Makefiles,
 and do `make` to build the decrypter executable.
 
+Compilation instructions for linux:
+- Clone the repository (`git clone https://github.com/CrackerCat/video_decrypter.git`)
+- Install CMake (Debian: `sudo apt install cmake`, Arch: `sudo pacman -S cmake`, Fedora: `sudo dnf install cmake`)
+- Create the `build` directory (`mkdir video_decrypter/widevine_decrypter/src/build`
+- CD into the `build` directory (`cd video_decrypter/widevine_decrypter/src/build`)
+- Generate CMake build files (`cmake ..`)
+- Build the program (`cmake --build .`)
+
 See the **[Wiki](https://github.com/x-hgg-x/video_decrypter/wiki)** for a running configuration
